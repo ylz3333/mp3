@@ -4,8 +4,10 @@ var express = require('express'),
     mongoose = require('mongoose'),
     bodyParser = require('body-parser');
 
-// Read .env file
-require('dotenv').config();
+// Read .env only if MONGODB_URI is not provided by environment (e.g., Render)
+if (!process.env.MONGODB_URI) {
+    require('dotenv').config();
+}
 
 // Create our Express application
 var app = express();
@@ -37,6 +39,7 @@ app.use(bodyParser.json());
 // Use routes as a module (see index.js)
 require('./routes')(app, router);
 
-// Start the server
-app.listen(port);
+// Start the server (bind to 0.0.0.0 for cloud envs)
+app.get('/', function (req, res) { res.status(200).send('OK'); });
+app.listen(port, '0.0.0.0');
 console.log('Server running on port ' + port);
